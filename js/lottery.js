@@ -1,16 +1,14 @@
 // let avatar = ` <img src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132"
 //              alt="" class="avatar">`
 
-let slideAvatarTimer = null
 
-let avatar = `<img src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
+let slideAvatarTimer = null
+let avatarAnimName = "animated bounceIn"
+let groupAnimName = "animated fadeIn"
+let slideAvatarSpeed = 2500
+// let avatar = `<img src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
 let myAvatar = `<img style="z-index: 2000" src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132" alt="" class="avatar">`
 
-let avatars = ""
-for (let i = 0; i < 150; i++) {
-    avatars += `<img key="姓名${i}" department="信息管理中心" src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
-}
-avatars += myAvatar
 
 let avatarWrapper = $(".avatar-container")
 let container = $(".container")
@@ -43,7 +41,7 @@ let draw = {
                     return
                 }
             }
-        }, 200)
+        }, 100)
 
         // 旧版的
         // this.timer = setInterval(() => {
@@ -81,13 +79,22 @@ $(function () {
     // 隐藏遮罩(抽奖结果层)
     hidePopup()
 
-    // 所有的头像,丢到头像容器
-    splitAvatarGroup(avatars)
+    avatarListTest().then((res) => {
+        let avatars = ""
+        for (let i = 0; i < res.length; i++) {
+            avatars += `<img class="avatar ${avatarAnimName}" cname="${res[i].cname}" department="${res[i].department || '部门未知'}" src="${res[i].avatar || 'http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64'}" alt="">`
+        }
+        // avatars += myAvatar
+        // 所有的头像,丢到头像容器
+        splitAvatarGroup(avatars)
 
-    // 轮播头像组
-    slideAvatarWrapper()
+        // 轮播头像组
+        // slideAvatarWrapper()
 
-    createEventListenr()
+        createEventListenr()
+    })
+
+
 })
 
 function createEventListenr() {
@@ -123,19 +130,26 @@ function stopLottery() {
 
 }
 
-function formatDecimal(num, decimal) {
-    num = num.toString()
-    let index = num.indexOf('.')
-    if (index !== -1) {
-        num = num.substring(0, decimal + index + 1)
-    } else {
-        num = num.substring(0)
+function sleep(delay) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, delay)
+    })
+}
+
+async function pushOneByOne(arr, target, start, end) {
+
+    // console.log(arr, target, start, end)
+
+    for (let i = start; i < end; i++) {
+        target.append(arr[i])
+        await sleep(10)
+
     }
-    return parseFloat(num).toFixed(decimal)
+
 }
 
 // 切分头像组放到容器
-function splitAvatarGroup(avatars) {
+async function splitAvatarGroup(avatars) {
     // 固定一排有多少个头像
     const colAvatarNum = 15
 
@@ -152,17 +166,42 @@ function splitAvatarGroup(avatars) {
         "容器宽: " + wrapperWidth,
         "容器高: " + wrapperHeight,
         "单头像长度: " + singleAvatarWidth,
-        )
+    )
+
+    // css 头像的宽度
+    let style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = `.avatar-container .avatar{width: calc(100%/${colAvatarNum}) !important;}`
+    document.getElementsByTagName('head')[0].appendChild(style);
+
     for (let i = 0; i < groupNum; i++) {
-        let oneGroupArr = $(avatars).slice(i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum)
-        // 把每一组头像添加到 avatarWrapper
-        i === 0
-            ? avatarWrapper.append($('<div class="one-group active"></div>').html(oneGroupArr))
-            : avatarWrapper.append($('<div class="one-group"></div>').html(oneGroupArr))
+        // if (i === 0) {
+        //     avatarWrapper.append($('<div class="one-group  active"></div>'))
+        // } else {
+        //     avatarWrapper.append($('<div class="one-group "></div>'))
+        // }
+        avatarWrapper.append($('<div class="one-group"></div>'))
+
+        // 要插入的目标页
+        let target = avatarWrapper.children().eq(i)
+        // 激活目标页,等待插入动画完成
+        target.addClass("active").siblings().removeClass("active")
+        await pushOneByOne($(avatars), target, i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum)
+
+        // let oneGroupArr = $(avatars).slice(i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum)
+        // // 把每一组头像添加到 avatarWrapper
+        // i === 0
+        //     ? avatarWrapper.append($('<div class="one-group  active"></div>').html(oneGroupArr))
+        //     : avatarWrapper.append($('<div class="one-group "></div>').html(oneGroupArr))
+        //
     }
 
-    // 更改图片的宽度
-    avatarWrapper.find(".avatar").css("width", `calc(100%/${colAvatarNum})`)
+    // 要先更改 css 图片的宽度
+    avatarWrapper.find(".avatar").removeClass(avatarAnimName)
+
+    // 轮播头像组
+    slideAvatarWrapper()
+
 
     // avatarWrapper.html(groupDom)
 
@@ -181,16 +220,16 @@ function slideAvatarWrapper() {
                 let nextActiveIdx = i + 1 >= group.length
                     ? 0
                     : i + 1
-                $(group[nextActiveIdx]).addClass("active").siblings().removeClass("active")
+                $(group[nextActiveIdx]).addClass("active " + groupAnimName).siblings().removeClass("active " + groupAnimName)
                 return
             }
         }
-    }, 1200)
+    }, slideAvatarSpeed)
 }
 
 function showPopup(image) {
     $(".header-wrapper .avatar").attr("src", image.getAttribute("src"))
-    $(".user-wrapper .name").text(image.getAttribute("key"))
+    $(".user-wrapper .name").text(image.getAttribute("cname"))
     $(".user-wrapper .department").text(image.getAttribute("department"))
 
     $(".popup-mask").show()
