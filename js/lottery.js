@@ -1,20 +1,34 @@
 // let avatar = ` <img src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132"
 //              alt="" class="avatar">`
 
-
+// 配置参数 BEGIN
+// 计时器
 let slideAvatarTimer = null
+let pollingSignListTimer = null
+// 头像动画名
 let avatarAnimName = "animated bounceIn"
 let groupAnimName = "animated fadeIn"
+// 轮播时延
 let slideAvatarSpeed = 2500
+// 抽奖随机人头时延
+let lotterySpeed = 50
+// 加入头像的时延
+let addAvatarSpeed = 50
+// 固定一排有多少个头像
+const colAvatarNum = 10
+// 一组里面有多少个头像
+let singleAvatarGroupNum = 0
 // let avatar = `<img src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
-let myAvatar = `<img style="z-index: 2000" src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132" alt="" class="avatar">`
+// 默认头像
+let defaultAvatar = `http://tm.lilanz.com/qywx/res/img/system.jpg`
+// 签到列表
+let signList = []
 
+// 配置参数 END
 
 let avatarWrapper = $(".avatar-container")
 let container = $(".container")
 
-let avatarWrapperHeight = avatarWrapper.height()
-let containerHeight = container.height()
 // 如果不能用 vh,就执行这个函数
 // addKeyFrames(`calc(-100% + ${container.height()}px)`)
 
@@ -27,6 +41,9 @@ let draw = {
         let avatarWrapper = $(".avatar-container")
         let group = avatarWrapper.children()
         group.prepend($(`<div class="avatar-mask mask"></div>`))
+
+        // 清掉以前的轮播,用更快的速度轮播抽奖
+        slideAvatarWrapper(500)
 
         this.timer = setInterval(() => {
             // 一边跳一边换页,所以要重新选择
@@ -41,7 +58,7 @@ let draw = {
                     return
                 }
             }
-        }, 100)
+        }, lotterySpeed)
 
         // 旧版的
         // this.timer = setInterval(() => {
@@ -60,11 +77,18 @@ let draw = {
         for (let i = 0; i < group.length; i++) {
             if ($(group[i]).hasClass("active")) {
                 let currentAvatars = $(group[i]).children()
+                // 中奖者,img
+                let awarder = currentAvatars[this.randomNum]
                 console.log(
-                    "中奖者: ", currentAvatars[this.randomNum]
+                    "中奖者: ", awarder
                 )
-                showPopup(currentAvatars[this.randomNum])
+                showPopup(awarder)
+                updateAwarder(awarder.getAttribute("key")).then((res) => {
 
+                }).catch((error) => {
+                    console.error(error)
+
+                })
                 return
             }
         }
@@ -79,10 +103,24 @@ $(function () {
     // 隐藏遮罩(抽奖结果层)
     hidePopup()
 
-    avatarListTest().then((res) => {
+    // avatarListTest().then((res) => {
+    getSignList().then(async (res) => {
+        let t = [{
+            "id": 1,
+            "cname": "李清峰",
+            "department": "信息管理中心",
+            "mobile": "15260825009",
+            "avatar": "http://shp.qpic.cn/bizmp/aFWqEucQiblaQ9VU2nArnomOPTCXKSsHJAroYAn7jnj9Xs91VkEB9mQ/",
+            "signtime": "2019-01-24 15:24:03"
+        }]
+        // signList = t
+        // res = t
+        signList = res
+
+
         let avatars = ""
         for (let i = 0; i < res.length; i++) {
-            avatars += `<img class="avatar ${avatarAnimName}" cname="${res[i].cname}" department="${res[i].department || '部门未知'}" src="${res[i].avatar || 'http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64'}" alt="">`
+            avatars += `<img class="avatar ${avatarAnimName}" cname="${res[i].cname}" department="${res[i].department || '部门未知'}" key="${res[i].cid || 0}" src="${res[i].avatar || defaultAvatar}" alt="">`
         }
         // avatars += myAvatar
         // 所有的头像,丢到头像容器
@@ -92,10 +130,58 @@ $(function () {
         // slideAvatarWrapper()
 
         createEventListenr()
+        pollingSignList()
     })
 
 
 })
+
+// 轮询签到列表
+function pollingSignList() {
+    pollingSignListTimer = setInterval(() => {
+        getSignList().then(async (res) => {
+            if (signList.length < res.length) {
+
+                let avatars = ""
+                // 从已有列表开始,循环新增的数量
+                for (let i = signList.length; i < res.length; i++) {
+                    avatars += `<img class="avatar ${avatarAnimName}" cname="${res[i].cname}" department="${res[i].department || '部门未知'}" key="${res[i].id || 0}" src="${res[i].avatar || defaultAvatar}" alt="">`
+                }
+                // await pushOneByOne(arr, target, start, end)
+                let avatarWrapper = $(".avatar-container")
+                let target = avatarWrapper.children().last()
+
+                console.warn(
+                    "一共:" + target.children().length + $(avatars).length,
+                    "一组可以容纳:" + singleAvatarGroupNum
+                    , )
+                if (target.children().length + $(avatars).length > singleAvatarGroupNum) {
+                    window.location.reload()
+                }
+
+                // 清掉计时器,停在单页等插入头像完成再开始轮播
+                clearInterval(slideAvatarTimer)
+                let group = avatarWrapper.children()
+
+                let lastGroup = avatarWrapper.children().last()
+                lastGroup.addClass("active").siblings().removeClass("active")
+
+                await pushOneByOne($(avatars), target, 0, $(avatars).length)
+
+                setTimeout(() => {
+                    slideAvatarWrapper()
+                    // 要先更改 css 图片的宽度
+                    avatarWrapper.find(".avatar").removeClass(avatarAnimName)
+                }, 2000)
+
+                signList = res
+
+            }
+        })
+
+    }, 2000)
+
+}
 
 function createEventListenr() {
     // 抽奖按钮
@@ -127,7 +213,6 @@ function stopLottery() {
     $(".img-begin-lottery").attr("src", "./image/begin-lottery.png")
 
     draw.stop()
-
 }
 
 function sleep(delay) {
@@ -142,17 +227,13 @@ async function pushOneByOne(arr, target, start, end) {
 
     for (let i = start; i < end; i++) {
         target.append(arr[i])
-        await sleep(10)
+        await sleep(addAvatarSpeed)
 
     }
-
 }
 
 // 切分头像组放到容器
 async function splitAvatarGroup(avatars) {
-    // 固定一排有多少个头像
-    const colAvatarNum = 15
-
     let wrapperWidth = avatarWrapper.width()
     let wrapperHeight = avatarWrapper.height()
     // 一排10个,单个正方形头像宽度
@@ -161,7 +242,7 @@ async function splitAvatarGroup(avatars) {
     let rowAvatarNum = Math.floor(wrapperHeight / singleAvatarWidth)
     let groupNum = Math.ceil(($(avatars).length / (rowAvatarNum * colAvatarNum)))
     // 一组里有多少个头像
-    let singleAvatarGroupNum = rowAvatarNum * colAvatarNum
+    singleAvatarGroupNum = rowAvatarNum * colAvatarNum
     console.warn(
         "容器宽: " + wrapperWidth,
         "容器高: " + wrapperHeight,
@@ -208,7 +289,8 @@ async function splitAvatarGroup(avatars) {
 }
 
 // 轮播头像组
-function slideAvatarWrapper() {
+function slideAvatarWrapper(speed) {
+    clearInterval(slideAvatarTimer)
 
     slideAvatarTimer = setInterval(() => {
         let avatarWrapper = $(".avatar-container")
@@ -224,7 +306,7 @@ function slideAvatarWrapper() {
                 return
             }
         }
-    }, slideAvatarSpeed)
+    }, speed || slideAvatarSpeed)
 }
 
 function showPopup(image) {

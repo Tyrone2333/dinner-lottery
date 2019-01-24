@@ -1,10 +1,12 @@
 // let baseUrl = 'http://192.168.36.171:3030/pigApi';
 let baseUrl
-if( window.location.host === "tm.lilanz.com" ){
-    baseUrl = "./itfripartycore.ashx"
-} else{
+if (window.location.host === "tm.lilanz.com") {
+    baseUrl = "../itfripartycore.ashx"
+} else {
     baseUrl = "http://tm.lilanz.com/qywx/test/2019itparty/itfripartycore.ashx"
+    // baseUrl = "http://localhost:8880/pigApi"
 }
+
 function _ajax(data, type) {
     let apiUrl = baseUrl
     return new Promise(function (resolve, reject) {
@@ -55,7 +57,8 @@ const _post = (data) => {
 }
 
 function $warn(msg) {
-    alert(msg)
+    console.error(msg)
+    // alert(msg)
 }
 
 // http://tm.lilanz.com/qywx/test/2019itparty/itfripartycore.ashx?action=avatarListTest
@@ -72,6 +75,21 @@ function $warn(msg) {
 function avatarListTest() {
     let params = {
         action: "avatarListTest",
+    }
+    return _get(params)
+}
+
+function getSignList() {
+    let params = {
+        action: "getSignList",
+    }
+    return _get(params)
+}
+
+function updateAwarder(cid) {
+    let params = {
+        action: "updateAwarder",
+        cid: cid,
     }
     return _get(params)
 }
