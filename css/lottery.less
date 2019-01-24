@@ -39,6 +39,7 @@ body {
   content: "";
   visibility: hidden;
 }
+
 .mask {
   height: 100%;
   width: 100%;
@@ -54,6 +55,7 @@ body {
   display: block;
   z-index: 1000;
 }
+
 .container {
   height: 100%;
   width: 100%;
@@ -108,7 +110,7 @@ body {
         .active {
           display: block;
         }
-        .avatar-highlight{
+        .avatar-highlight {
           position: relative;
           z-index: 2000;
         }
@@ -127,6 +129,7 @@ body {
       margin: 0 auto;
       background: url("../image/lottery-center.png") no-repeat;
       background-size: 100% 100%;
+      z-index: 1;
 
     }
     // 抽奖台底部
@@ -137,7 +140,7 @@ body {
       transform: translate(-50%, 0);
       width: 100%;
       height: 18%;
-
+z-index: 2;
       background: url("../image/lottery-bottom.png") no-repeat;
       background-size: 100% 100%;
       .begin-lottery {
@@ -192,14 +195,16 @@ body {
   }
 }
 
-
+.popup-mask {
+  //display: none;
+}
 
 .popup {
   position: absolute;
   left: 50%;
   top: 50%;
   width: 50%;
-  height: 75%;
+  //height: 75%;
   transform: translate(-50%, -50%);
   border-radius: 4px;
   z-index: 1200;
@@ -207,6 +212,7 @@ body {
   opacity: 1;
   padding: 10px 5px;
 
+  transition: all .3s ease-in;
   .btn-close-popup {
     position: absolute;
     right: 17px;

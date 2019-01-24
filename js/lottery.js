@@ -8,17 +8,13 @@ let myAvatar = `<img style="z-index: 2000" src="http://thirdwx.qlogo.cn/mmopen/r
 
 let avatars = ""
 for (let i = 0; i < 150; i++) {
-    avatars += `<img key="${i}" src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
+    avatars += `<img key="姓名${i}" department="信息管理中心" src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
 }
 avatars += myAvatar
 
 let avatarWrapper = $(".avatar-container")
 let container = $(".container")
 
-// 所有的头像,丢到头像容器
-splitAvatarGroup(avatars)
-
-slideAvatarWrapper()
 let avatarWrapperHeight = avatarWrapper.height()
 let containerHeight = container.height()
 // 如果不能用 vh,就执行这个函数
@@ -32,7 +28,7 @@ let draw = {
         // 先添加 黑色 遮罩
         let avatarWrapper = $(".avatar-container")
         let group = avatarWrapper.children()
-        group.prepend($(`<div class="mask"></div>`))
+        group.prepend($(`<div class="avatar-mask mask"></div>`))
 
         this.timer = setInterval(() => {
             // 一边跳一边换页,所以要重新选择
@@ -67,10 +63,9 @@ let draw = {
             if ($(group[i]).hasClass("active")) {
                 let currentAvatars = $(group[i]).children()
                 console.log(
-                    "中奖者: " + this.randomNum,
-                    currentAvatars[this.randomNum]
+                    "中奖者: ", currentAvatars[this.randomNum]
                 )
-                // showPopup()
+                showPopup(currentAvatars[this.randomNum])
 
                 return
             }
@@ -80,8 +75,20 @@ let draw = {
         console.log("中奖者: " + this.randomNum, avatars[this.randomNum])
     }
 }
-hidePopup()
-createEventListenr()
+
+$(function () {
+
+    // 隐藏遮罩(抽奖结果层)
+    hidePopup()
+
+    // 所有的头像,丢到头像容器
+    splitAvatarGroup(avatars)
+
+    // 轮播头像组
+    slideAvatarWrapper()
+
+    createEventListenr()
+})
 
 function createEventListenr() {
     // 抽奖按钮
@@ -91,6 +98,14 @@ function createEventListenr() {
         } else {
             beginLottery()
         }
+    })
+
+    // 点击遮罩关闭
+    $(".popup-mask").on("click", function () {
+        hidePopup()
+        $(".avatar-mask").remove()
+
+        slideAvatarWrapper()
     })
 
 }
@@ -108,10 +123,21 @@ function stopLottery() {
 
 }
 
-// 轮播头像组
+function formatDecimal(num, decimal) {
+    num = num.toString()
+    let index = num.indexOf('.')
+    if (index !== -1) {
+        num = num.substring(0, decimal + index + 1)
+    } else {
+        num = num.substring(0)
+    }
+    return parseFloat(num).toFixed(decimal)
+}
+
+// 切分头像组放到容器
 function splitAvatarGroup(avatars) {
     // 固定一排有多少个头像
-    const colAvatarNum = 10
+    const colAvatarNum = 15
 
     let wrapperWidth = avatarWrapper.width()
     let wrapperHeight = avatarWrapper.height()
@@ -122,26 +148,33 @@ function splitAvatarGroup(avatars) {
     let groupNum = Math.ceil(($(avatars).length / (rowAvatarNum * colAvatarNum)))
     // 一组里有多少个头像
     let singleAvatarGroupNum = rowAvatarNum * colAvatarNum
-
+    console.warn(
+        "容器宽: " + wrapperWidth,
+        "容器高: " + wrapperHeight,
+        "单头像长度: " + singleAvatarWidth,
+        )
     for (let i = 0; i < groupNum; i++) {
-        let oneGroupArr = $(avatars).slice(i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum )
-       console.log(oneGroupArr)
+        let oneGroupArr = $(avatars).slice(i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum)
         // 把每一组头像添加到 avatarWrapper
         i === 0
             ? avatarWrapper.append($('<div class="one-group active"></div>').html(oneGroupArr))
             : avatarWrapper.append($('<div class="one-group"></div>').html(oneGroupArr))
     }
 
+    // 更改图片的宽度
+    avatarWrapper.find(".avatar").css("width", `calc(100%/${colAvatarNum})`)
+
     // avatarWrapper.html(groupDom)
 
 }
 
-// 切分头像组放到容器
+// 轮播头像组
 function slideAvatarWrapper() {
-    let avatarWrapper = $(".avatar-container")
-    let group = avatarWrapper.children()
 
     slideAvatarTimer = setInterval(() => {
+        let avatarWrapper = $(".avatar-container")
+        let group = avatarWrapper.children()
+
         for (let i = 0; i < group.length; i++) {
             if ($(group[i]).hasClass("active")) {
                 // 下一个轮播的索引
@@ -152,11 +185,14 @@ function slideAvatarWrapper() {
                 return
             }
         }
-
     }, 1200)
 }
 
-function showPopup() {
+function showPopup(image) {
+    $(".header-wrapper .avatar").attr("src", image.getAttribute("src"))
+    $(".user-wrapper .name").text(image.getAttribute("key"))
+    $(".user-wrapper .department").text(image.getAttribute("department"))
+
     $(".popup-mask").show()
     $(".popup").show()
 }
