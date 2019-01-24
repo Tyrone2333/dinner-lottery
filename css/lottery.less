@@ -27,7 +27,9 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at 50% 35%, #334455, #000);
+  background-size: cover;
+  background: #fff url("../image/bg.jpg") no-repeat center 0;
+  //background: radial-gradient(circle at 50% 35%, #334455, #000);
   position: relative;
 }
 
@@ -37,7 +39,21 @@ body {
   content: "";
   visibility: hidden;
 }
-
+.mask {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  word-break: break-all;
+  background-color: #000;
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  opacity: 0.5;
+  display: block;
+  z-index: 1000;
+}
 .container {
   height: 100%;
   width: 100%;
@@ -47,6 +63,97 @@ body {
   z-index: 0;
   overflow: hidden;
   word-break: break-all;
+
+  .lottery-arena {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 0);
+    width: 91%;
+    height: 87.4%;
+
+    // 头部联谊标题
+    .img-title {
+      width: 40%;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, 0);
+      z-index: 10;
+
+    }
+    // 抽奖台上部
+    .arena-top {
+      position: relative;
+      left: 0;
+      bottom: 0;
+      width: 92.73%;
+      height: 5.9%;
+      margin: 0 auto;
+      background: url("../image/lottery-top.png") no-repeat;
+      background-size: 100% 100%;
+    }
+    .arena-center {
+      padding: 2%;
+      box-sizing: border-box;
+
+      .avatar-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        z-index: 1000;
+        .one-group {
+          display: none;
+        }
+        .active {
+          display: block;
+        }
+        .avatar-highlight{
+          position: relative;
+          z-index: 2000;
+        }
+        img {
+          width: 10%;
+          vertical-align: top;
+        }
+      }
+    }
+    .arena-center {
+      position: relative;
+      left: 0;
+      bottom: 0;
+      width: 92.73%;
+      height: 76.19%;
+      margin: 0 auto;
+      background: url("../image/lottery-center.png") no-repeat;
+      background-size: 100% 100%;
+
+    }
+    // 抽奖台底部
+    .arena-bottom {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 0);
+      width: 100%;
+      height: 18%;
+
+      background: url("../image/lottery-bottom.png") no-repeat;
+      background-size: 100% 100%;
+      .begin-lottery {
+        position: absolute;
+        left: 50%;
+        top: 30%;
+        transform: translate(-50%, -50%);
+        width: 21%;
+        img {
+          width: 100%;
+          //background: url("../image/begin-lottery.png") no-repeat;
+        }
+
+      }
+    }
+  }
 }
 
 .avatar-wrapper {
@@ -85,21 +192,7 @@ body {
   }
 }
 
-.mask {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  overflow: hidden;
-  word-break: break-all;
-  background-color: #000;
-  filter: alpha(opacity=50);
-  -moz-opacity: 0.5;
-  opacity: 0.5;
-  display: block;
-  z-index: 1000;
-}
+
 
 .popup {
   position: absolute;
@@ -110,11 +203,11 @@ body {
   transform: translate(-50%, -50%);
   border-radius: 4px;
   z-index: 1200;
-  background-color: #334455;
+  //background-color: #334455;
   opacity: 1;
   padding: 10px 5px;
 
-  .btn-close-popup{
+  .btn-close-popup {
     position: absolute;
     right: 17px;
     top: 10px;
@@ -128,7 +221,7 @@ body {
   .user-wrapper {
     position: relative;
     z-index: 1300;
-    margin-top: 50px;
+    margin-top: 10em;
     text-align: center;
     color: #fff;
   }
@@ -138,13 +231,15 @@ body {
     justify-content: center;
     align-items: center;
     height: 200px;
-    margin-top: 50px;
+    font-size: 18px;
+    //margin-top: 50px;
     img {
       //position: relative;
       z-index: 2;
       border-radius: 50%;
-      width: 150px;
-      height: 150px;
+      width: 16em;
+      //width: 150px;
+      //height: 150px;
     }
     .circle-wrapper {
       //position: relative;
@@ -158,19 +253,17 @@ body {
         --x: -50%;
         --y: -50%;
       }
-
-      div[class="a-circle"] {
-
+      .a-circle {
         position: absolute;
         top: 50%;
         left: 50%;
         -webkit-transform: translate(var(--x, -50%), var(--y, -50%)) rotate(0deg);
         transform: translate(var(--x, -50%), var(--y, -50%)) rotate(0deg);
-        font-size: 20vmin;
-        width: 3em;
-        height: 3em;
-        width: 200px;
-        height: 200px;
+        //font-size: 16vmin;
+        width: 20em;
+        height: 20em;
+        //width: 300px;
+        //height: 300px;
         border-radius: 90% 95% 85% 105%;
         background: #0f0;
         mix-blend-mode: screen;
@@ -185,31 +278,31 @@ body {
         align-items: center;
         justify-content: center;
       }
-      div[class="a-circle"]::after {
+      .a-circle::after {
         font-size: 1em;
         white-space: nowrap;
       }
-      div[class="a-circle"]:nth-child(1) {
+      .a-circle:nth-child(1) {
         --x: -53%;
         --y: -53%;
         --t: 37;
       }
-      div[class="a-circle"]:nth-child(2) {
+      .a-circle:nth-child(2) {
         --x: -47%;
         --y: -52%;
         --t: 58;
       }
-      div[class="a-circle"]:nth-child(3) {
+      .a-circle:nth-child(3) {
         --x: -45%;
         --y: -50%;
         --t: 46;
       }
-      div[class="a-circle"]:nth-child(4) {
+      .a-circle:nth-child(4) {
         --x: -53%;
         --y: -45%;
         --t: 72;
       }
-      div[class="a-circle"]:nth-child(5) {
+      .a-circle:nth-child(5) {
         --x: -55%;
         --y: -45%;
         --t: 62;

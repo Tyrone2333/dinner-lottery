@@ -23,7 +23,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(circle at 50% 35%, #334455, #000);
+  background-size: cover;
+  background: #fff url("../image/bg.jpg") no-repeat center 0;
   position: relative;
 }
 .clearfix::after {
@@ -31,6 +32,21 @@ body {
   clear: both;
   content: "";
   visibility: hidden;
+}
+.mask {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  word-break: break-all;
+  background-color: #000;
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  opacity: 0.5;
+  display: block;
+  z-index: 1000;
 }
 .container {
   height: 100%;
@@ -41,6 +57,86 @@ body {
   z-index: 0;
   overflow: hidden;
   word-break: break-all;
+}
+.container .lottery-arena {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 0);
+  width: 91%;
+  height: 87.4%;
+}
+.container .lottery-arena .img-title {
+  width: 40%;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  z-index: 10;
+}
+.container .lottery-arena .arena-top {
+  position: relative;
+  left: 0;
+  bottom: 0;
+  width: 92.73%;
+  height: 5.9%;
+  margin: 0 auto;
+  background: url("../image/lottery-top.png") no-repeat;
+  background-size: 100% 100%;
+}
+.container .lottery-arena .arena-center {
+  padding: 2%;
+  box-sizing: border-box;
+}
+.container .lottery-arena .arena-center .avatar-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1000;
+}
+.container .lottery-arena .arena-center .avatar-container .one-group {
+  display: none;
+}
+.container .lottery-arena .arena-center .avatar-container .active {
+  display: block;
+}
+.container .lottery-arena .arena-center .avatar-container .avatar-highlight {
+  position: relative;
+  z-index: 2000;
+}
+.container .lottery-arena .arena-center .avatar-container img {
+  width: 10%;
+  vertical-align: top;
+}
+.container .lottery-arena .arena-center {
+  position: relative;
+  left: 0;
+  bottom: 0;
+  width: 92.73%;
+  height: 76.19%;
+  margin: 0 auto;
+  background: url("../image/lottery-center.png") no-repeat;
+  background-size: 100% 100%;
+}
+.container .lottery-arena .arena-bottom {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 0);
+  width: 100%;
+  height: 18%;
+  background: url("../image/lottery-bottom.png") no-repeat;
+  background-size: 100% 100%;
+}
+.container .lottery-arena .arena-bottom .begin-lottery {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  transform: translate(-50%, -50%);
+  width: 21%;
+}
+.container .lottery-arena .arena-bottom .begin-lottery img {
+  width: 100%;
 }
 .avatar-wrapper {
   float: left;
@@ -71,21 +167,6 @@ body {
     transform: translate3d(0, 0, 0);
   }
 }
-.mask {
-  height: 100%;
-  width: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  overflow: hidden;
-  word-break: break-all;
-  background-color: #000;
-  filter: alpha(opacity=50);
-  -moz-opacity: 0.5;
-  opacity: 0.5;
-  display: block;
-  z-index: 1000;
-}
 .popup {
   position: absolute;
   left: 50%;
@@ -95,7 +176,6 @@ body {
   transform: translate(-50%, -50%);
   border-radius: 4px;
   z-index: 1200;
-  background-color: #334455;
   opacity: 1;
   padding: 10px 5px;
 }
@@ -112,7 +192,7 @@ body {
 .popup .user-wrapper {
   position: relative;
   z-index: 1300;
-  margin-top: 50px;
+  margin-top: 10em;
   text-align: center;
   color: #fff;
 }
@@ -122,13 +202,12 @@ body {
   justify-content: center;
   align-items: center;
   height: 200px;
-  margin-top: 50px;
+  font-size: 18px;
 }
 .popup .header-wrapper img {
   z-index: 2;
   border-radius: 50%;
-  width: 150px;
-  height: 150px;
+  width: 16em;
 }
 .popup .header-wrapper .circle-wrapper {
   position: absolute;
@@ -142,17 +221,14 @@ body {
   --x: -50%;
   --y: -50%;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"] {
+.popup .header-wrapper .circle-wrapper .a-circle {
   position: absolute;
   top: 50%;
   left: 50%;
   -webkit-transform: translate(var(--x, -50%), var(--y, -50%)) rotate(0deg);
   transform: translate(var(--x, -50%), var(--y, -50%)) rotate(0deg);
-  font-size: 20vmin;
-  width: 3em;
-  height: 3em;
-  width: 200px;
-  height: 200px;
+  width: 20em;
+  height: 20em;
   border-radius: 90% 95% 85% 105%;
   background: #0f0;
   mix-blend-mode: screen;
@@ -167,31 +243,31 @@ body {
   align-items: center;
   justify-content: center;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"]::after {
+.popup .header-wrapper .circle-wrapper .a-circle::after {
   font-size: 1em;
   white-space: nowrap;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"]:nth-child(1) {
+.popup .header-wrapper .circle-wrapper .a-circle:nth-child(1) {
   --x: -53%;
   --y: -53%;
   --t: 37;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"]:nth-child(2) {
+.popup .header-wrapper .circle-wrapper .a-circle:nth-child(2) {
   --x: -47%;
   --y: -52%;
   --t: 58;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"]:nth-child(3) {
+.popup .header-wrapper .circle-wrapper .a-circle:nth-child(3) {
   --x: -45%;
   --y: -50%;
   --t: 46;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"]:nth-child(4) {
+.popup .header-wrapper .circle-wrapper .a-circle:nth-child(4) {
   --x: -53%;
   --y: -45%;
   --t: 72;
 }
-.popup .header-wrapper .circle-wrapper div[class="a-circle"]:nth-child(5) {
+.popup .header-wrapper .circle-wrapper .a-circle:nth-child(5) {
   --x: -55%;
   --y: -45%;
   --t: 62;
