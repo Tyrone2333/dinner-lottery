@@ -23,7 +23,10 @@ let singleAvatarGroupNum = 0
 let defaultAvatar = `http://tm.lilanz.com/qywx/res/img/system.jpg`
 // 签到列表
 let signList = []
-
+let itNum = 0
+let scNum = 0
+let counterObj = {}
+let oldCounter = {}
 // 配置参数 END
 
 let avatarWrapper = $(".avatar-container")
@@ -70,6 +73,7 @@ let draw = {
     stop: function () {
         clearInterval(this.timer)
         clearInterval(slideAvatarTimer)
+        clearInterval(pollingSignListTimer)
 
         let avatarWrapper = $(".avatar-container")
         let group = avatarWrapper.children()
@@ -115,12 +119,17 @@ $(function () {
         }]
         // signList = t
         // res = t
-        signList = res
-
+        signList = res.list
+        itNum = res.it
+        scNum = res.sc
+        updateSignNum({
+            it: itNum,
+            sc: scNum
+        })
 
         let avatars = ""
-        for (let i = 0; i < res.length; i++) {
-            avatars += `<img class="avatar ${avatarAnimName}" cname="${res[i].cname}" department="${res[i].department || '部门未知'}" key="${res[i].cid || 0}" src="${res[i].avatar || defaultAvatar}" alt="">`
+        for (let i = 0; i < signList.length; i++) {
+            avatars += `<img class="avatar ${avatarAnimName}" cname="${signList[i].cname}" department="${signList[i].department || '部门未知'}" key="${signList[i].cid || 0}" src="${signList[i].avatar || defaultAvatar}" alt="">`
         }
         // avatars += myAvatar
         // 所有的头像,丢到头像容器
@@ -130,18 +139,53 @@ $(function () {
         // slideAvatarWrapper()
 
         createEventListenr()
-        pollingSignList()
     })
 
 
 })
 
+function updateSignNum(count) {
+    console.warn(count,oldCounter)
+    for (let p in count) {
+        if (counterObj[p]) {
+            console.log(counterObj[p],count[p] , oldCounter[p])
+            if (count[p] === oldCounter[p])
+                // 只能退出本轮,return 就不会循环 count 后面的 key
+                continue
+            (function (key) {
+                // counterObj[key].reset();
+                setTimeout(function () {
+                    counterObj[key].update(count[key]);
+                    console.log(counterObj[key], count[key]);
+                }, 50);
+            })(p);
+        } else {
+            var opts = {
+                useEasing: true
+            };
+            counterObj[p] = new CountUp(p + "-num", 0, count[p], 0, 2, opts);
+            counterObj[p].start();
+        }
+
+    }
+    oldCounter = count
+}
+
 // 轮询签到列表
 function pollingSignList() {
+    clearInterval(pollingSignListTimer)
+
     pollingSignListTimer = setInterval(() => {
         getSignList().then(async (res) => {
-            if (signList.length < res.length) {
+            // itNum = res.it
+            // scNum = res.sc
 
+            if (signList.length < res.list.length) {
+                updateSignNum({
+                    it: res.it,
+                    sc: res.sc
+                })
+                res = res.list
                 let avatars = ""
                 // 从已有列表开始,循环新增的数量
                 for (let i = signList.length; i < res.length; i++) {
@@ -152,9 +196,9 @@ function pollingSignList() {
                 let target = avatarWrapper.children().last()
 
                 console.warn(
-                    "一共:" + target.children().length + $(avatars).length,
+                    "一共:" + (target.children().length + $(avatars).length),
                     "一组可以容纳:" + singleAvatarGroupNum
-                    , )
+                    ,)
                 if (target.children().length + $(avatars).length > singleAvatarGroupNum) {
                     window.location.reload()
                 }
@@ -170,9 +214,8 @@ function pollingSignList() {
 
                 setTimeout(() => {
                     slideAvatarWrapper()
-                    // 要先更改 css 图片的宽度
                     avatarWrapper.find(".avatar").removeClass(avatarAnimName)
-                }, 2000)
+                }, 5000)
 
                 signList = res
 
@@ -198,7 +241,14 @@ function createEventListenr() {
         hidePopup()
         $(".avatar-mask").remove()
 
+        // 重新打开轮询和轮播
         slideAvatarWrapper()
+        pollingSignList()
+    })
+
+    $(".img-title").on("click", function () {
+        preload()
+
     })
 
 }
@@ -211,7 +261,6 @@ function beginLottery() {
 
 function stopLottery() {
     $(".img-begin-lottery").attr("src", "./image/begin-lottery.png")
-
     draw.stop()
 }
 
@@ -252,7 +301,7 @@ async function splitAvatarGroup(avatars) {
     // css 头像的宽度
     let style = document.createElement('style');
     style.type = 'text/css';
-    style.innerHTML = `.avatar-container .avatar{width: calc(100%/${colAvatarNum}) !important;}`
+    style.innerHTML = `.avatar-container .avatar{width: calc(100%/${colAvatarNum}) !important;height:${singleAvatarWidth}px;`
     document.getElementsByTagName('head')[0].appendChild(style);
 
     for (let i = 0; i < groupNum; i++) {
@@ -280,11 +329,11 @@ async function splitAvatarGroup(avatars) {
     // 要先更改 css 图片的宽度
     avatarWrapper.find(".avatar").removeClass(avatarAnimName)
 
+    // 轮询签到人数
+    pollingSignList()
+
     // 轮播头像组
     slideAvatarWrapper()
-
-
-    // avatarWrapper.html(groupDom)
 
 }
 
@@ -329,24 +378,16 @@ function getRandomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-// 设置keyframes属性
-function addKeyFrames(y) {
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    var keyFrames = `
-    @keyframes scrollAvatar {
-      0% {
-        transform: translate3d(0, 0, 0);
-      }
-      50% {
-        transform: translate3d(0, A_DYNAMIC_VALUE , 0);
-      }
-      100% {
-        transform: translate3d(0, 0, 0);
-      }
-    }
-    `
-    style.innerHTML = keyFrames.replace(/A_DYNAMIC_VALUE/g, y);
-    document.getElementsByTagName('head')[0].appendChild(style);
-}
+// 预加载头像图片
+function preload() {
+    avatarListTest().then((res) => {
+        console.log(res)
+        for (let i = 0; i < res.length; i++) {
+            let img = new Image();
+            img.src = res[i].avatar
+        }
 
+    }).catch((e) => {
+        console.error(e)
+    })
+}

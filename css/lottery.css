@@ -129,6 +129,19 @@ body {
   z-index: 2;
   background: url("../image/lottery-bottom.png") no-repeat;
   background-size: 100% 100%;
+  display: flex;
+  /* align-items: center; */
+  justify-content: center;
+}
+.container .lottery-arena .arena-bottom .count-num {
+  flex: 1;
+  text-align: center;
+  margin-top: 3%;
+  font-size: 24px;
+  color: #fff;
+}
+.container .lottery-arena .arena-bottom .count-num span {
+  font-size: 32px;
 }
 .container .lottery-arena .arena-bottom .begin-lottery {
   position: absolute;

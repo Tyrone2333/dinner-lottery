@@ -20,8 +20,8 @@
 
             <!--旧版上下滚动-->
             <!--<div class="avatar-wrapper clearfix">-->
-                <!--<img src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132"-->
-                     <!--alt="" class="avatar">-->
+            <!--<img src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132"-->
+            <!--alt="" class="avatar">-->
             <!--</div>-->
         </div>
         <div class="arena-center">
@@ -31,12 +31,17 @@
             </div>
         </div>
         <div class="arena-bottom">
+            <div class="count-num left">
+                IT: <span id="it-num"></span>
+            </div>
             <div class="begin-lottery">
                 <img class="img-begin-lottery" src="./image/begin-lottery.png" alt="">
             </div>
+            <div class="count-num right ">
+                生产: <span id="sc-num"></span>
+            </div>
         </div>
     </div>
-
 
 
 </div>
@@ -66,7 +71,7 @@
     </div>
 
 </div>
-
+<script type="text/javascript" src="./js/countUp.min.js"></script>
 <script src="./api/ajax.js"></script>
 <script src="./js/zepto.min.js"></script>
 <script src="./js/lottery.js"></script>
