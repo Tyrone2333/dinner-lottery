@@ -34,12 +34,7 @@ function _ajax(data, type) {
                 }
             },
             error: function (err) {
-                // if(err.errcode == 101){
-                //
-                // }else {
-                //     $warn(err)
-                // }
-                $warn("服务器发生错误,请稍后再试")
+                $warn("网络开小差了,请稍后再试")
 
                 reject(err);
             }
@@ -58,7 +53,7 @@ const _post = (data) => {
 
 function $warn(msg) {
     console.error(msg)
-    // alert(msg)
+    alert(msg)
 }
 
 // http://tm.lilanz.com/qywx/test/2019itparty/itfripartycore.ashx?action=avatarListTest

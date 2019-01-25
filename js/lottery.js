@@ -15,7 +15,7 @@ let lotterySpeed = 50
 // 加入头像的时延
 let addAvatarSpeed = 50
 // 固定一排有多少个头像
-const colAvatarNum = 10
+const colAvatarNum = 15
 // 一组里面有多少个头像
 let singleAvatarGroupNum = 0
 // let avatar = `<img src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
@@ -23,14 +23,11 @@ let singleAvatarGroupNum = 0
 let defaultAvatar = `http://tm.lilanz.com/qywx/res/img/system.jpg`
 // 签到列表
 let signList = []
-let itNum = 0
-let scNum = 0
 let counterObj = {}
 let oldCounter = {}
 // 配置参数 END
 
 let avatarWrapper = $(".avatar-container")
-let container = $(".container")
 
 // 如果不能用 vh,就执行这个函数
 // addKeyFrames(`calc(-100% + ${container.height()}px)`)
@@ -108,30 +105,19 @@ $(function () {
     hidePopup()
 
     // avatarListTest().then((res) => {
+    //     signList = res
     getSignList().then(async (res) => {
-        let t = [{
-            "id": 1,
-            "cname": "李清峰",
-            "department": "信息管理中心",
-            "mobile": "15260825009",
-            "avatar": "http://shp.qpic.cn/bizmp/aFWqEucQiblaQ9VU2nArnomOPTCXKSsHJAroYAn7jnj9Xs91VkEB9mQ/",
-            "signtime": "2019-01-24 15:24:03"
-        }]
-        // signList = t
-        // res = t
         signList = res.list
-        itNum = res.it
-        scNum = res.sc
         updateSignNum({
-            it: itNum,
-            sc: scNum
+            it: res.it,
+            sc: res.sc
         })
 
         let avatars = ""
         for (let i = 0; i < signList.length; i++) {
             avatars += `<img class="avatar ${avatarAnimName}" cname="${signList[i].cname}" department="${signList[i].department || '部门未知'}" key="${signList[i].cid || 0}" src="${signList[i].avatar || defaultAvatar}" alt="">`
         }
-        // avatars += myAvatar
+
         // 所有的头像,丢到头像容器
         splitAvatarGroup(avatars)
 
@@ -140,17 +126,14 @@ $(function () {
 
         createEventListenr()
     })
-
-
 })
 
 function updateSignNum(count) {
-    console.warn(count,oldCounter)
     for (let p in count) {
         if (counterObj[p]) {
-            console.log(counterObj[p],count[p] , oldCounter[p])
+            console.log(counterObj[p], count[p], oldCounter[p])
             if (count[p] === oldCounter[p])
-                // 只能退出本轮,return 就不会循环 count 后面的 key
+            // 只能退出本轮,return 就不会循环 count 后面的 key 了
                 continue
             (function (key) {
                 // counterObj[key].reset();
@@ -160,7 +143,7 @@ function updateSignNum(count) {
                 }, 50);
             })(p);
         } else {
-            var opts = {
+            let opts = {
                 useEasing: true
             };
             counterObj[p] = new CountUp(p + "-num", 0, count[p], 0, 2, opts);
@@ -177,8 +160,6 @@ function pollingSignList() {
 
     pollingSignListTimer = setInterval(() => {
         getSignList().then(async (res) => {
-            // itNum = res.it
-            // scNum = res.sc
 
             if (signList.length < res.list.length) {
                 updateSignNum({
@@ -223,18 +204,19 @@ function pollingSignList() {
         })
 
     }, 2000)
+}
 
+function handleLottery() {
+    if ($(".img-begin-lottery").attr("src") === "./image/stop-lottery.png") {
+        stopLottery()
+    } else {
+        beginLottery()
+    }
 }
 
 function createEventListenr() {
     // 抽奖按钮
-    $(".begin-lottery").on("click", function () {
-        if ($(".img-begin-lottery").attr("src") === "./image/stop-lottery.png") {
-            stopLottery()
-        } else {
-            beginLottery()
-        }
-    })
+    $(".begin-lottery").on("click", handleLottery)
 
     // 点击遮罩关闭
     $(".popup-mask").on("click", function () {
@@ -246,10 +228,15 @@ function createEventListenr() {
         pollingSignList()
     })
 
+    // 预加载头像
     $(".img-title").on("click", function () {
         preload()
-
     })
+    // 空格抽奖
+    $(document).keydown(function (event) {
+        if (event.code === "Space")
+            handleLottery()
+    });
 
 }
 
@@ -271,13 +258,9 @@ function sleep(delay) {
 }
 
 async function pushOneByOne(arr, target, start, end) {
-
-    // console.log(arr, target, start, end)
-
     for (let i = start; i < end; i++) {
         target.append(arr[i])
         await sleep(addAvatarSpeed)
-
     }
 }
 
@@ -289,7 +272,11 @@ async function splitAvatarGroup(avatars) {
     let singleAvatarWidth = wrapperWidth / colAvatarNum
     // 可以容纳多少行头像
     let rowAvatarNum = Math.floor(wrapperHeight / singleAvatarWidth)
+    // 有多少个组,至少要有一个组
     let groupNum = Math.ceil(($(avatars).length / (rowAvatarNum * colAvatarNum)))
+    groupNum = groupNum === 0
+        ? 1
+        : groupNum
     // 一组里有多少个头像
     singleAvatarGroupNum = rowAvatarNum * colAvatarNum
     console.warn(
@@ -305,11 +292,6 @@ async function splitAvatarGroup(avatars) {
     document.getElementsByTagName('head')[0].appendChild(style);
 
     for (let i = 0; i < groupNum; i++) {
-        // if (i === 0) {
-        //     avatarWrapper.append($('<div class="one-group  active"></div>'))
-        // } else {
-        //     avatarWrapper.append($('<div class="one-group "></div>'))
-        // }
         avatarWrapper.append($('<div class="one-group"></div>'))
 
         // 要插入的目标页
@@ -317,13 +299,6 @@ async function splitAvatarGroup(avatars) {
         // 激活目标页,等待插入动画完成
         target.addClass("active").siblings().removeClass("active")
         await pushOneByOne($(avatars), target, i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum)
-
-        // let oneGroupArr = $(avatars).slice(i * singleAvatarGroupNum, (i + 1) * singleAvatarGroupNum)
-        // // 把每一组头像添加到 avatarWrapper
-        // i === 0
-        //     ? avatarWrapper.append($('<div class="one-group  active"></div>').html(oneGroupArr))
-        //     : avatarWrapper.append($('<div class="one-group "></div>').html(oneGroupArr))
-        //
     }
 
     // 要先更改 css 图片的宽度
@@ -386,7 +361,6 @@ function preload() {
             let img = new Image();
             img.src = res[i].avatar
         }
-
     }).catch((e) => {
         console.error(e)
     })

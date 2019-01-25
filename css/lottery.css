@@ -136,12 +136,12 @@ body {
 .container .lottery-arena .arena-bottom .count-num {
   flex: 1;
   text-align: center;
-  margin-top: 3%;
-  font-size: 24px;
+  margin-top: 2%;
+  font-size: 32px;
   color: #fff;
 }
 .container .lottery-arena .arena-bottom .count-num span {
-  font-size: 32px;
+  font-size: 40px;
 }
 .container .lottery-arena .arena-bottom .begin-lottery {
   position: absolute;
@@ -207,7 +207,7 @@ body {
 .popup .user-wrapper {
   position: relative;
   z-index: 1300;
-  margin-top: 10em;
+  margin-top: 5em;
   text-align: center;
   color: #fff;
 }
@@ -216,7 +216,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
   font-size: 18px;
 }
 .popup .header-wrapper img {
