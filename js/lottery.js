@@ -18,7 +18,6 @@ let addAvatarSpeed = 50
 const colAvatarNum = 15
 // 一组里面有多少个头像
 let singleAvatarGroupNum = 0
-// let avatar = `<img src="http://wx.qlogo.cn/mmopen/PiajxSqBRaELjhaJH7u24kBD2KVfBiaBj7jn6l7c4SRRlziagIsoaeU4icbflCIrv469JDpk7jiaNBUYfQYgAq7ME2Q/64" alt="" class="avatar">`
 // 默认头像
 let defaultAvatar = `http://tm.lilanz.com/qywx/res/img/system.jpg`
 // 签到列表
@@ -28,9 +27,6 @@ let oldCounter = {}
 // 配置参数 END
 
 let avatarWrapper = $(".avatar-container")
-
-// 如果不能用 vh,就执行这个函数
-// addKeyFrames(`calc(-100% + ${container.height()}px)`)
 
 // 抽奖的效果
 let draw = {
@@ -119,7 +115,7 @@ $(function () {
         }
 
         // 所有的头像,丢到头像容器
-        splitAvatarGroup(avatars)
+        await splitAvatarGroup(avatars)
 
         // 轮播头像组
         // slideAvatarWrapper()
@@ -207,10 +203,15 @@ function pollingSignList() {
 }
 
 function handleLottery() {
-    if ($(".img-begin-lottery").attr("src") === "./image/stop-lottery.png") {
-        stopLottery()
+    let lotteryImg = $(".img-begin-lottery")
+    if (lotteryImg.attr("src") === "./image/stop-lottery.png") {
+        // 结束抽奖
+        lotteryImg.attr("src", "./image/begin-lottery.png")
+        draw.stop()
     } else {
-        beginLottery()
+        // 开始抽奖
+        lotteryImg.attr("src", "./image/stop-lottery.png")
+        draw.start()
     }
 }
 
@@ -229,26 +230,13 @@ function createEventListenr() {
     })
 
     // 预加载头像
-    $(".img-title").on("click", function () {
-        preload()
-    })
+    $(".img-title").on("click", preloadAvatar)
     // 空格抽奖
     $(document).keydown(function (event) {
         if (event.code === "Space")
             handleLottery()
     });
 
-}
-
-// 开始抽奖
-function beginLottery() {
-    $(".img-begin-lottery").attr("src", "./image/stop-lottery.png")
-    draw.start()
-}
-
-function stopLottery() {
-    $(".img-begin-lottery").attr("src", "./image/begin-lottery.png")
-    draw.stop()
 }
 
 function sleep(delay) {
@@ -354,7 +342,7 @@ function getRandomNum(min, max) {
 }
 
 // 预加载头像图片
-function preload() {
+function preloadAvatar() {
     avatarListTest().then((res) => {
         console.log(res)
         for (let i = 0; i < res.length; i++) {
