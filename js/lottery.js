@@ -32,14 +32,17 @@ let avatarWrapper = $(".avatar-container")
 let draw = {
     timer: null,
     randomNum: 0,
+    isDrawing: false,
     start: function () {
+        this.isDrawing = true
         // 先添加 黑色 遮罩
         let avatarWrapper = $(".avatar-container")
         let group = avatarWrapper.children()
         group.prepend($(`<div class="avatar-mask mask"></div>`))
 
-        // 清掉以前的轮播,用更快的速度轮播抽奖
-        slideAvatarWrapper(500)
+        // 清掉以前的轮播,用更快的速度轮播抽奖,并且不用动画
+        slideAvatarWrapper(500, false)
+        clearInterval(pollingSignListTimer)
 
         this.timer = setInterval(() => {
             // 一边跳一边换页,所以要重新选择
@@ -66,8 +69,8 @@ let draw = {
     stop: function () {
         clearInterval(this.timer)
         clearInterval(slideAvatarTimer)
-        clearInterval(pollingSignListTimer)
 
+        this.isDrawing = false
         let avatarWrapper = $(".avatar-container")
         let group = avatarWrapper.children()
 
@@ -98,9 +101,9 @@ let draw = {
 $(function () {
 
     // 隐藏遮罩(抽奖结果层)
-    hidePopup()
+    // hidePopup()
 
-    // avatarListTest().then((res) => {
+    // avatarListTest().then(async (res) => {
     //     signList = res
     getSignList().then(async (res) => {
         signList = res.list
@@ -189,20 +192,24 @@ function pollingSignList() {
 
                 await pushOneByOne($(avatars), target, 0, $(avatars).length)
 
+                avatarWrapper.find(".avatar").removeClass(avatarAnimName)
                 setTimeout(() => {
+                    if (draw.isDrawing) {
+                        console.log("正在抽奖,不能重复轮播")
+                        return
+                    }
                     slideAvatarWrapper()
-                    avatarWrapper.find(".avatar").removeClass(avatarAnimName)
                 }, 5000)
-
                 signList = res
-
             }
         })
-
     }, 2000)
 }
 
 function handleLottery() {
+    if ($(".popup").hasClass("show")) {
+        return
+    }
     let lotteryImg = $(".img-begin-lottery")
     if (lotteryImg.attr("src") === "./image/stop-lottery.png") {
         // 结束抽奖
@@ -276,7 +283,7 @@ async function splitAvatarGroup(avatars) {
     // css 头像的宽度
     let style = document.createElement('style');
     style.type = 'text/css';
-    style.innerHTML = `.avatar-container .avatar{width: calc(100%/${colAvatarNum}) !important;height:${singleAvatarWidth}px;`
+    style.innerHTML = `.avatar-container .avatar{width: calc(100%/${colAvatarNum}) !important;min-width: calc(100%/${colAvatarNum});height:${singleAvatarWidth}px;`
     document.getElementsByTagName('head')[0].appendChild(style);
 
     for (let i = 0; i < groupNum; i++) {
@@ -301,7 +308,7 @@ async function splitAvatarGroup(avatars) {
 }
 
 // 轮播头像组
-function slideAvatarWrapper(speed) {
+function slideAvatarWrapper(speed, uesAnim = true) {
     clearInterval(slideAvatarTimer)
 
     slideAvatarTimer = setInterval(() => {
@@ -314,7 +321,9 @@ function slideAvatarWrapper(speed) {
                 let nextActiveIdx = i + 1 >= group.length
                     ? 0
                     : i + 1
-                $(group[nextActiveIdx]).addClass("active " + groupAnimName).siblings().removeClass("active " + groupAnimName)
+                // 默认在切换的时候使用动画过渡,如果以前有轮播会残留动画class,要移除
+                let anim = uesAnim ? groupAnimName : ""
+                $(group[nextActiveIdx]).addClass("active " + anim).siblings().removeClass("active " + groupAnimName)
                 return
             }
         }
@@ -326,13 +335,13 @@ function showPopup(image) {
     $(".user-wrapper .name").text(image.getAttribute("cname"))
     $(".user-wrapper .department").text(image.getAttribute("department"))
 
-    $(".popup-mask").show()
-    $(".popup").show()
+    $(".popup-mask").addClass("show").removeClass("hide")
+    $(".popup").addClass("show").removeClass("hide")
 }
 
 function hidePopup() {
-    $(".popup-mask").hide()
-    $(".popup").hide()
+    $(".popup-mask").removeClass("show").addClass("hide")
+    $(".popup").removeClass("show").addClass("hide")
 }
 
 // 获取 (min, max) 的随机数
