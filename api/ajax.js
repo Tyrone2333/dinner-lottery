@@ -3,7 +3,7 @@ let baseUrl
 if (window.location.host === "tm.lilanz.com") {
     baseUrl = "../itfripartycore.ashx"
 } else {
-    baseUrl = "http://tm.lilanz.com/qywx/test/2019itparty/itfripartycore.ashx"
+    baseUrl = "https://tm.lilanz.com/qywx/test/2019itparty/itfripartycore.ashx"
     // baseUrl = "http://localhost:8880/pigApi"
 }
 
