@@ -1,0 +1,85 @@
+:root {
+  --deg: 1;
+  --x: -50%;
+  --y: -50%;
+}
+
+div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(var(--x, -50%), var(--y, -50%)) rotate(0deg);
+          transform: translate(var(--x, -50%), var(--y, -50%)) rotate(0deg);
+  font-size: 20vmin;
+  width: 3em;
+  height: 3em;
+  border-radius: 90% 95% 85% 105%;
+  background: #0f0;
+  mix-blend-mode: screen;
+  -webkit-filter: hue-rotate(0deg);
+          filter: hue-rotate(0deg);
+  -webkit-animation: wobble calc(150ms * var(--t)) linear infinite;
+          animation: wobble calc(150ms * var(--t)) linear infinite;
+  -webkit-transform-origin: -var(--y) -var(--x);
+          transform-origin: -var(--y) -var(--x);
+  box-shadow: 0 0 .5em .2em #000 inset, 0 0 .15em 0 #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+div::after {
+  font-size: 1em;
+  white-space: nowrap;
+}
+div:nth-child(1) {
+  --x: -53%;
+  --y: -53%;
+  --t: 37;
+}
+div:nth-child(2) {
+  --x: -47%;
+  --y: -52%;
+  --t: 58;
+}
+div:nth-child(3) {
+  --x: -45%;
+  --y: -50%;
+  --t: 46;
+}
+div:nth-child(4) {
+  --x: -53%;
+  --y: -45%;
+  --t: 72;
+}
+div:nth-child(5) {
+  --x: -55%;
+  --y: -45%;
+  --t: 62;
+}
+
+@-webkit-keyframes wobble {
+  to {
+    -webkit-filter: hue-rotate(360deg);
+            filter: hue-rotate(360deg);
+    -webkit-transform: translate(var(--x), var(--y)) rotate(360deg);
+            transform: translate(var(--x), var(--y)) rotate(360deg);
+  }
+}
+
+@keyframes wobble {
+  to {
+    -webkit-filter: hue-rotate(360deg);
+            filter: hue-rotate(360deg);
+    -webkit-transform: translate(var(--x), var(--y)) rotate(360deg);
+            transform: translate(var(--x), var(--y)) rotate(360deg);
+  }
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: serif;
+  background: radial-gradient(circle at 50% 35%, #334455, #000);
+}

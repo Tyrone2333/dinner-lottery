@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./css/animate.css">
+    <link rel="stylesheet" href="./css/lottery.css">
+    <title>信息管理中心 X 生产管理中心</title>
+</head>
+<body>
+<div class="container clearfix">
+
+    <div class="lottery-arena">
+
+        <div class="arena-top">
+            <img class="img-title" src="./image/title.png" alt="">
+        </div>
+        <div class="arena-center">
+            <!--头像容器-->
+            <div class="avatar-container"></div>
+        </div>
+        <div class="arena-bottom">
+            <div class="count-num left">
+                IT: <span id="it-num"></span>
+            </div>
+            <div class="begin-lottery">
+                <img class="img-begin-lottery" src="./image/begin-lottery.png" alt="">
+            </div>
+            <div class="count-num right ">
+                生产: <span id="sc-num"></span>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="popup-mask mask hide"></div>
+<div class="popup hide">
+    <!--关闭按钮-->
+    <!--<div class="btn-close-popup">X</div>-->
+
+    <!--头像特效-->
+    <div class="header-wrapper square-img animated infinite heartBeat">
+        <div class="circle-wrapper">
+            <div class="a-circle"></div>
+            <div class="a-circle"></div>
+            <div class="a-circle"></div>
+            <div class="a-circle"></div>
+            <div class="a-circle"></div>
+        </div>
+        <img src="http://thirdwx.qlogo.cn/mmopen/rlURialPOob0XybYlNzB04F8kkgWTOl28n8U7qWB7OQaFTdC6z2GiaiaMFAA5hbTiarhRdxibfP98O7NLGNriaYUaC0PxY3OklZ31a/132"
+             alt="" class="avatar">
+    </div>
+
+    <!--用户信息-->
+    <div class="user-wrapper">
+        <h1 class="name animated slideInUp">xxx</h1>
+        <h1 class="department animated slideInUp slow">xx部</h1>
+    </div>
+
+</div>
+<script type="text/javascript" src="./js/countUp.min.js"></script>
+<script src="./api/ajax.js"></script>
+<script src="./js/zepto.min.js"></script>
+<script src="./js/lottery.js"></script>
+</body>
+</html>
+
